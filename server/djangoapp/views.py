@@ -88,14 +88,23 @@ def login_user(request):
 # ...
 
 def get_dealerships(request):
-    """ Render the index page with a list of dealerships
+    """ Fetches and returns a list of dealerships as a JSON response, optionally filtered by state.
+
+        This view function retrieves dealership data from an external API using the
+        `get_request` function. If the 'state' parameter is provided in the request's
+        GET parameters, it fetches dealerships for that specific state. Otherwise,
+        it fetches all dealerships.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request object. The 'state'
+                parameter can be included in the request's GET parameters to filter
+                dealerships by a specific state.
 
         Returns:
-            JsonResponse: JSON response containing: 
-                            Status code (200 for success) and
-                            List of dealerships under the key "dealers". 
-
-                                The list of dealerships is obtained from an external API via the `get_request` function.
+            JsonResponse: A JSON response containing:
+                - "status": 200, indicating a successful request.
+                - "dealers": A list of dealership objects (dictionaries) retrieved
+                from the external API.
     """
     if(state == "All"):
         endpoint = '/fetchDealers'
