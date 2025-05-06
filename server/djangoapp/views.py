@@ -1,4 +1,16 @@
-# Uncomment the required imports before adding the code
+""" Contains the view functions that handle HTTP requests and return responses for this Django app.
+
+    Input:
+        HttpRequest: Each view function typically receives an HttpRequest object
+            containing metadata about the incoming request (e.g., headers,
+            query parameters, user information).
+
+    Output:
+        HttpResponse: Each view function must return an HttpResponse object
+            (or a subclass like JsonResponse, TemplateResponse) that represents
+            the server's response to the client.
+
+"""
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
@@ -16,14 +28,30 @@ from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
 
 from .models import CarMake, CarModel
+from .restapis import get_request, analyze_review_sentiments, post_review
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
-# Create your views here.
-
+# View functions
 def get_cars(request):
+    """ Retrieves a list of car models along with their makes and returns it as a JSON response.
+
+        Checks if any car makes exist in the database. If not, it initiates the
+        process of populating the car make and model data (using the `initiate()` function).
+        Then, it fetches all car models, selecting the related car make for each model,
+        and formats the data into a list of dictionaries containing the car model name
+        and its corresponding car make name.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request object.
+
+        Returns:
+            JsonResponse: A JSON response containing a dictionary with the key "CarModels".
+                The value associated with this key is a list of dictionaries, where each
+                dictionary represents a car model and its make, with the keys "CarModel"
+                and "CarMake".
+    """
     count = CarMake.objects.filter().count()
     print(count)
     if(count == 0):
@@ -59,19 +87,109 @@ def login_user(request):
 # def registration(request):
 # ...
 
-# # Update the `get_dealerships` view to render the index page with
-# a list of dealerships
-# def get_dealerships(request):
-# ...
+def get_dealerships(request):
+    """ Render the index page with a list of dealerships
 
-# Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request,dealer_id):
-# ...
+        Returns:
+            JsonResponse: JSON response containing: 
+                            Status code (200 for success) and
+                            List of dealerships under the key "dealers". 
 
-# Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-# ...
+                                The list of dealerships is obtained from an external API via the `get_request` function.
+    """
+    if(state == "All"):
+        endpoint = '/fetchDealers'
+    else:
+        endpoint = '/fetchDealers/'+state
+    dealerships = get_request(endpoint)
+    return JsonResponse({"status":200, "dealers":dealerships})
 
-# Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+
+def get_dealer_reviews(request,dealer_id):
+    """ Fetches and analyzes reviews for a specific dealer, returning a JSON response.
+
+        Retrieves reviews for the given dealer ID from an external API, analyzes
+        the sentiment of each review, and includes the sentiment in the response.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request object.
+            dealer_id (int): The ID of the dealer for whom to retrieve reviews.
+
+        Returns:
+            JsonResponse: A JSON response containing:
+                - "status": 200 for success (reviews found and analyzed),
+                        400 for a bad request (invalid or missing dealer_id).
+                - "review" (list, if status is 200): A list of review dictionaries. Each
+                dictionary contains the original review details along with an added
+                "sentiment" key indicating the analyzed sentiment.
+                - "message" (str, if status is 400): An error message indicating a bad request.
+    """
+    if(dealer_id):
+        endpoint = '/fetchReviews/dealer/'+str(dealer_id)
+        reviews = get_request(endpoint)
+        for review_detail in reviews:
+            response = analyze_review_sentiments(review_detail['review'])
+            print(response)
+            review_detail['sentiment'] = response['sentiment']
+        return JsonResponse({"status": 200, "review":reviews})
+    else:
+        return JsonResponse({"status": 400, "message": "Bad Request"})
+
+
+def get_dealer_details(request, dealer_id):
+    """ Fetches and returns the details of a specific dealer as a JSON response.
+
+        Retrieves dealer information based on the provided dealer ID from an
+        external API.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request object.
+            dealer_id (int): The ID of the dealer to retrieve details for.
+
+        Returns:
+            JsonResponse: A JSON response containing:
+                - "status": 200 for success (dealer details found),
+                        400 for a bad request (invalid or missing dealer_id).
+                - "dealer" (dict, if status is 200): A dictionary containing all
+                the details of the requested dealer, as returned by the external API.
+                - "message" (str, if status is 400): An error message indicating a bad request.
+    """
+    if(dealer_id):
+        endpoint = '/fetchDealers/'+str(dealer_id)
+        dealership = get_request(endpoint)
+        return JsonResponse({"status": 200, "dealer":dealership})
+    else:
+        return JsonResponse({"status": 400, "message": "Bad Request"})
+
+        
+def add_review(request):
+    """ Handles the submission of a new dealership review from an authenticated user.
+
+        This view function checks if the user is authenticated. If so, it parses the
+        incoming JSON request body, calls the `post_review` function to send the
+        review data to the backend API, and returns a JSON response indicating
+        the success or failure of the operation. If the user is not authenticated,
+        it returns an unauthorized response.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request object. The request
+                body is expected to contain the review data in JSON format.
+
+        Returns:
+            JsonResponse: A JSON response containing:
+                - "status": 200 if the review was successfully posted to the backend.
+                - "status": 401 if there was an error during the review posting process.
+                The response will also include a "message" key with an error description.
+                - "status": 403 if the user is not authenticated. The response will
+                also include a "message" key indicating "Unauthorized".
+    """
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
+        try:
+            response = post_review(data)
+            return JsonResponse({"status": 200})
+        except:
+            return JsonResponse({"status": 401, "message": "Error in posting review"})
+    else:
+        return JsonResponse({"status": 403, "message": "Unauthorized"})
+
