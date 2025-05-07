@@ -2,6 +2,16 @@
 
 """
 
+""" Flow
+    URL Routing: Defines the URL patterns for this Django app, mapping URLs to view functions.
+
+    Flow:
+        1. Incoming HTTP Request: A user's browser or application makes a request to a specific URL.
+        > 2. Current File (urls.py): This file contains the `urlpatterns` list, which defines how URLs are matched.
+        3. URL Resolution: Django's URL resolver compares the requested URL against these patterns.
+        4. View Function Execution (in views.py): When a match is found, the corresponding view function is executed to handle the request.
+"""
+
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings

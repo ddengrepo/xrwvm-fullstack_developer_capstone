@@ -12,6 +12,17 @@
 
 """
 
+""" Flow
+    Request Handling Logic: Contains view functions that receive HTTP requests, process them (often interacting with models or external APIs), and return responses.
+
+    Flow:
+        1. Incoming HTTP Request: Django receives a request based on a URL defined in urls.py.
+        > 2. Current File (views.py): A specific view function is executed based on the matched URL.
+        3. Processing: The view function interacts with Django models (via ORM) or external APIs (via restapis.py).
+        4. Response Generation: The view function creates an HttpResponse (often JsonResponse or TemplateResponse) containing the requested data or result.
+        5. HTTP Response: Django sends the generated response back to the user's browser or application.
+"""
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User

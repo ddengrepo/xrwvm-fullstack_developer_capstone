@@ -1,3 +1,13 @@
+""" Flow
+    Data Population Script: Contains functions to populate the database with initial or sample data.
+
+    Flow:
+        1. Developer Execution: Developer runs this script (e.g., via Django shell or manage.py command).
+        > 2. Current File (populate.py): This file contains Python code that interacts with Django models.
+        3. ORM Interaction: The script uses the ORM (defined in models.py) to create and save data.
+        4. Database Update: The database is populated with the data defined in the script.
+"""
+
 from .models import CarMake, CarModel
 
 def initiate():

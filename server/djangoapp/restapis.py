@@ -8,6 +8,17 @@
     
 """
 
+""" Flow
+    External API Interaction: Defines functions for communicating with external REST APIs (e.g., backend, sentiment analyzer).
+
+    Flow:
+        1. View Function Call (in views.py): A view function needs data or to trigger an action on an external service.
+        > 2. Current File (restapis.py): This file contains functions like `get_request` and `post_review`.
+        3. HTTP Request: These functions use the `requests` library to send HTTP requests to external URLs.
+        4. External API Response: The external API processes the request and sends back a response (often JSON).
+        5. Response Processing (in views.py): The view function then handles the received data.
+"""
+
 import requests
 import os
 from dotenv import load_dotenv
