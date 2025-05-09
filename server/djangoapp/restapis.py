@@ -54,7 +54,7 @@ def get_request(endpoint, **kwargs):
 
 def analyze_review_sentiments(text):
     """ Sends a GET request to the sentiment analyzer microservice for text analysis
-    
+
         Returns: 
             the JSON response or None on error.
     """
