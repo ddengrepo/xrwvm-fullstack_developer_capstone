@@ -3,7 +3,6 @@
     This module contains the Django model definitions for representing car makes
     and car models. These models define the structure of the data stored in the
     application's database.
-
 """
 
 """ Flow
