@@ -68,7 +68,7 @@ def analyze_review_sentiments(text):
         print("Network exception occurred")
 
 
-def post_review(data_dict):
+def _post_review(data_dict):
     """ Sends a POST request to the backend URL's "/insert_review" endpoint to add a new dealership review.
 
         Takes a dictionary containing the review data and transmits it as a JSON payload
@@ -87,6 +87,24 @@ def post_review(data_dict):
     request_url = backend_url+"/insert_review"
     try:
         response: requests.post(request_url, json=data_dict)
+        print(response.json())
+        return response.json()
+    except:
+        print("Network exception occurred")
+
+# DEBUG
+def post_review(data_dict):
+    """Sends a POST request to the backend URL's "/insert_review" endpoint...
+
+    ... (rest of your docstring) ...
+    """
+    request_url = backend_url + "/insert_review"
+    print(f"DEBUG: post_review called with data: {data_dict}")  # Added debug print
+    print(f"DEBUG: request_url: {request_url}")
+    try:
+        response = requests.post(request_url, json=data_dict)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        print(f"DEBUG: response.status_code: {response.status_code}") # print status code
         print(response.json())
         return response.json()
     except:

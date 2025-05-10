@@ -215,7 +215,7 @@ def get_dealer_details(request, dealer_id):
         return JsonResponse({"status":400,"message":"Bad Request"})
 
         
-def add_review(request):
+def _add_review(request):
     """ Handles the submission of a new dealership review from an authenticated user.
 
         This view function checks if the user is authenticated. If so, it parses the
@@ -244,5 +244,30 @@ def add_review(request):
         except:
             return JsonResponse({"status": 401, "message": "Error in posting review"})
     else:
+        return JsonResponse({"status": 403, "message": "Unauthorized"})
+
+# DEBUG
+def add_review(request):
+    """Handles the submission of a new dealership review from an authenticated user.
+
+    ... (rest of your docstring) ...
+    """
+    print("DEBUG: add_review view called")  # Added debug print
+    if not request.user.is_anonymous:  # Changed to use not
+        print("DEBUG: User is authenticated")
+        try:
+            data = json.loads(request.body)
+            print(f"DEBUG: Received JSON data: {data}")  # Added debug print
+            response = post_review(data)
+            print(f"DEBUG: Response from post_review: {response}")  # Added debug print
+            return JsonResponse({"status": 200})
+        except json.JSONDecodeError as e:
+            print(f"DEBUG: JSONDecodeError: {e}")
+            return JsonResponse({"status": 400, "message": "Invalid JSON"})
+        except Exception as e:
+            print(f"DEBUG: Exception in add_review: {e}")  # Added debug print with exception
+            return JsonResponse({"status": 401, "message": "Error in posting review"})
+    else:
+        print("DEBUG: User is not authenticated")  # Added debug print
         return JsonResponse({"status": 403, "message": "Unauthorized"})
 
