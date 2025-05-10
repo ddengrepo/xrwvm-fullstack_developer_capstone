@@ -59,12 +59,13 @@ def analyze_review_sentiments(text):
             the JSON response or None on error.
     """
     request_url = sentiment_analyzer_url+"analyze/"+text
-    try: 
+    try:
+        # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
         return response.json()
     except Exception as err:
-        print(f'Unexpected {err=}, {type(err)=}')
-        print('Network exception occurred..')
+        print(f"Unexpected {err=}, {type(err)=}")
+        print("Network exception occurred")
 
 
 def post_review(data_dict):
