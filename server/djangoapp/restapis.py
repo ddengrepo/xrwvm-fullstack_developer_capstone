@@ -1,4 +1,5 @@
-""" Defines functions for interacting with external REST APIs related to dealership data and sentiment analysis.
+""" Defines functions for interacting with external REST APIs related to 
+    dealership data and sentiment analysis.
 
     This module provides functions that make HTTP requests (GET and POST) to backend
     services to retrieve information about dealerships, reviews, and to analyze
@@ -6,17 +7,21 @@
     requests, and processing the JSON responses. Error handling for network
     exceptions is also included.
     
-"""
-
-""" Flow
-    External API Interaction: Defines functions for communicating with external REST APIs (e.g., backend, sentiment analyzer).
+Flow:
+    External API Interaction: Defines functions for communicating with external 
+    REST APIs (e.g., backend, sentiment analyzer).
 
     Flow:
-        1. View Function Call (in views.py): A view function needs data or to trigger an action on an external service.
-        > 2. Current File (restapis.py): This file contains functions like `get_request` and `post_review`.
-        3. HTTP Request: These functions use the `requests` library to send HTTP requests to external URLs.
-        4. External API Response: The external API processes the request and sends back a response (often JSON).
-        5. Response Processing (in views.py): The view function then handles the received data.
+        1. View Function Call (in views.py): A view function needs data or to 
+           trigger an action on an external service.
+        > 2. Current File (restapis.py): This file contains functions like 
+             `get_request` and `post_review`.
+        3. HTTP Request: These functions use the `requests` library to send 
+           HTTP requests to external URLs.
+        4. External API Response: The external API processes the request and 
+           sends back a response (often JSON).
+        5. Response Processing (in views.py): The view function then handles
+           the received data.
 """
 
 import requests
@@ -35,7 +40,7 @@ def get_request(endpoint, **kwargs):
     """ Sends a GET request to the backend URL's endpoint with optional parameters
         
         Returns:
-            the JSON response or None on network error. 
+            the JSON response or None on network error.
     """
     params = ""
     if(kwargs):
@@ -53,9 +58,10 @@ def get_request(endpoint, **kwargs):
 
 
 def analyze_review_sentiments(text):
-    """ Sends a GET request to the sentiment analyzer microservice for text analysis
+    """ Sends a GET request to the sentiment analyzer microservice for 
+        text analysis
 
-        Returns: 
+        Returns:
             the JSON response or None on error.
     """
     request_url = sentiment_analyzer_url+"analyze/"+text
@@ -69,10 +75,11 @@ def analyze_review_sentiments(text):
 
 
 def _post_review(data_dict):
-    """ Sends a POST request to the backend URL's "/insert_review" endpoint to add a new dealership review.
+    """ Sends a POST request to the backend URL's "/insert_review" endpoint to
+        add a new dealership review.
 
-        Takes a dictionary containing the review data and transmits it as a JSON payload
-        in the request body.
+        Takes a dictionary containing the review data and transmits it as a 
+        JSON payload in the request body.
 
         Args:
             data_dict (dict): A dictionary containing the key-value pairs for all
@@ -80,9 +87,10 @@ def _post_review(data_dict):
                 'review', 'rating', 'purchase_date', 'car_make', 'car_model').
 
         Returns:
-            dict: The JSON response from the backend after attempting to add the review.
-                This might include information about the success or failure of the
-                operation. Returns None if a network exception occurs.
+            dict: The JSON response from the backend after attempting to add 
+                the review. This might include information about the success or 
+                failure of the operation. Returns None if a network 
+                exception occurs.
     """
     request_url = backend_url+"/insert_review"
     try:
@@ -99,12 +107,15 @@ def post_review(data_dict):
     ... (rest of your docstring) ...
     """
     request_url = backend_url + "/insert_review"
-    print(f"DEBUG: post_review called with data: {data_dict}")  # Added debug print
+    # Added debug print
+    print(f"DEBUG: post_review called with data: {data_dict}")
     print(f"DEBUG: request_url: {request_url}")
     try:
         response = requests.post(request_url, json=data_dict)
-        response.raise_for_status()  # Raise an exception for bad status codes
-        print(f"DEBUG: response.status_code: {response.status_code}") # print status code
+        # Raise an exception for bad status codes
+        response.raise_for_status()
+        # print status code
+        print(f"DEBUG: response.status_code: {response.status_code}")
         print(response.json())
         return response.json()
     except:

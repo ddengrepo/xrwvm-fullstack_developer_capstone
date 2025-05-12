@@ -3,18 +3,27 @@
     This module contains the Django model definitions for representing car makes
     and car models. These models define the structure of the data stored in the
     application's database.
-"""
 
-""" Flow
+Flow:
     Data Layer: Defines database models (CarMake, CarModel) for the application.
 
     Flow:
-        1. Request (in views.py):        A user action triggers a request handled by a view function.
-        2. Django ORM Interaction:       The view uses Django's ORM (Object-Relational Mapper) to interact with the database.
-        > 3. Current File (models.py):    This file contains the definitions of the database tables (CarMake and CarModel) that the ORM uses.
-        4. Database Query:               The ORM translates the view's requests into SQL queries to the database.
-        5. ORM Processing:               The database returns raw data, which the ORM converts back into Python objects based on the model definitions in this file.
-        6. Retrieve (data in views.py):  The view function then uses these Python objects to generate a response for the user.
+        1. Request (in views.py):        
+                A user action triggers a request handled by a view function.
+        2. Django ORM Interaction:       
+                The view uses Django's ORM (Object-Relational Mapper) to 
+                interact with the database.
+        > 3. Current File (models.py):    
+                This file contains the definitions of the database tables 
+                (CarMake and CarModel) that the ORM uses.
+        4. Database Query:               
+                The ORM translates the view's requests into SQL queries to the 
+                database.
+        5. ORM Processing:               
+                The database returns raw data, which the ORM converts back into 
+                Python objects based on the model definitions in this file.
+        6. Retrieve (data in views.py):  The view function then uses these 
+                Python objects to generate a response for the user.
 """
 
 from django.db import models
@@ -29,7 +38,7 @@ class CarMake(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.name 
+        return self.name
 
 
 class CarModel(models.Model):
@@ -49,4 +58,3 @@ class CarModel(models.Model):
 
     def __str__(self):
         return self.name
-
