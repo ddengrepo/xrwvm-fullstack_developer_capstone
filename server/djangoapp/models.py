@@ -54,7 +54,7 @@ class CarModel(models.Model):
     year = models.IntegerField(
         default=2025,
         validators=[
-            MaxValueValidator(2025),
+            MaxValueValidator(now().year),
             MinValueValidator(2015)
         ]
     )
