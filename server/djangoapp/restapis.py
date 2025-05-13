@@ -51,7 +51,7 @@ def searchcars_request(endpoint, **kwargs):
     print("GET from {} ".format(request_url))
     try:
         response = requests.get(request_url)
-        return reponse.json()
+        return response.json()
     except Exception as e:
         print(f'Exception occurred: {e}')
 

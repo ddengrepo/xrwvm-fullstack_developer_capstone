@@ -75,6 +75,7 @@ return(
       <h4  style={{color:"grey"}}>{dealer['city']},{dealer['address']}, Zip - {dealer['zip']}, {dealer['state']} </h4>
       </div>
       <div class="reviews_panel">
+      <a href={`/searchcars/${id}`}>SearchCars</a>	
       {reviews.length === 0 && unreviewed === false ? (
         <text>Loading Reviews....</text>
       ):  unreviewed === true? <div>No reviews yet! </div> :
