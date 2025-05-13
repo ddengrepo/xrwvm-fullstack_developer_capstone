@@ -34,11 +34,11 @@
                 or application.
 """
 
-from django.http import HttpResponseRedirect, HttpResponse
+#from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
+#from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import logout
-from django.contrib import messages
+#from django.contrib import messages
 from datetime import datetime
 
 from django.http import JsonResponse
@@ -115,9 +115,6 @@ def logout_request(request):
 # Create a `registration` view to handle sign up request
 # @csrf_exempt
 def registration(request):
-    #context = {}
-
-    # load & extract request data to use in below logic
     data = json.loads(request.body)
     username = data['userName']
     password = data['password']
@@ -204,7 +201,6 @@ def get_dealer_reviews(request, dealer_id):
                 - "message" (str, if status is 400): An error message
                         indicating a bad request.
     """
-    #dealer = get_object_or_404(Dealer, pk=dealer_id)
     if (dealer_id):
         endpoint = "/fetchReviews/dealer/"+str(dealer_id)
         reviews = get_request(endpoint)
@@ -238,7 +234,6 @@ def get_dealer_details(request, dealer_id):
                 - "message" (str, if status is 400):
                         An error message indicating a bad request.
     """
-    #dealer_id = get_object_or_404(Dealer, pk=dealer_id)
     if (dealer_id):
         endpoint = "/fetchDealer/"+str(dealer_id)
         dealership = get_request(endpoint)
