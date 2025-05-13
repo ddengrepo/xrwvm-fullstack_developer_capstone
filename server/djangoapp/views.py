@@ -133,6 +133,7 @@ def registration(request):
         username_exist = True
     except Exception as e:
         # If not, log 'this as a new user'
+        logger.debug(f"Error checking for existing user: {e}")
         logger.debug("{} is new user".format(username))
 
     # If it is a new user
@@ -158,7 +159,7 @@ def get_dealerships(request, state="All"):
 
         This view function retrieves dealership data from an external API using
         the`get_request` function. If the 'state' parameter is provided in the
-        request's GET parameters, it fetches dealerships for that specific 
+        request's GET parameters, it fetches dealerships for that specific
         state. Otherwise, it fetches all dealerships.
 
         Args:
@@ -172,7 +173,7 @@ def get_dealerships(request, state="All"):
                 - "dealers": A list of dealership objects (dictionaries)
                    retrieved from the external API.
     """
-    if(state == "All"):
+    if (state == "All"):
         endpoint = "/fetchDealers/"
     else:
         endpoint = "/fetchDealers/"+state
@@ -203,17 +204,14 @@ def get_dealer_reviews(request, dealer_id):
                 - "message" (str, if status is 400): An error message
                         indicating a bad request.
     """
-    # if dealer id has been provided
-    if (dealer_id):
-        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
-        reviews = get_request(endpoint)
-        for review_detail in reviews:
-            response = analyze_review_sentiments(review_detail['review'])
-            print(response)
-            review_detail['sentiment'] = response['sentiment']
-        return JsonResponse({"status": 200, "reviews": reviews})
-    else:
-        return JsonResponse({"status": 400, "message": "Bad Request"})
+    dealer = get_object_or_404(Dealer, pk=dealer_id)
+    endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+    reviews = get_request(endpoint)
+    for review_detail in reviews:
+        response = analyze_review_sentiments(review_detail['review'])
+        print(response)
+        review_detail['sentiment'] = response['sentiment']
+    return JsonResponse({"status": 200, "reviews": reviews})
 
 
 def get_dealer_details(request, dealer_id):
@@ -238,12 +236,10 @@ def get_dealer_details(request, dealer_id):
                 - "message" (str, if status is 400):
                         An error message indicating a bad request.
     """
-    if (dealer_id):
-        endpoint = "/fetchDealer/"+str(dealer_id)
-        dealership = get_request(endpoint)
-        return JsonResponse({"status": 200, "dealer": dealership})
-    else:
-        return JsonResponse({"status": 400, "message": "Bad Request"})
+    dealer_id = get_object_or_404(Dealer, pk=dealer_id)
+    endpoint = "/fetchDealer/"+str(dealer_id)
+    dealership = get_request(endpoint)
+    return JsonResponse({"status": 200, "dealer": dealership})
 
 
 def _add_review(request):
@@ -272,7 +268,7 @@ def _add_review(request):
         data = json.loads(request.body)
         try:
             response = post_review(data)
-            return JsonResponse({"status": 200})
+            return JsonResponse({"status": 200, "data": response})
         except Exception as e:
             return JsonResponse({"status": 401,
                                  "message": f"Error: {e}"})
