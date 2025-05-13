@@ -20,7 +20,8 @@
         1. Incoming HTTP Request:
                 Django receives a request based on a URL defined in urls.py.
         > 2. Current File (views.py):
-                  A specific view function is executed based on the matched URL.
+                  A specific view function is executed based on the matched
+                  URL.
         3. Processing:
                 The view function interacts with Django models (via ORM) or
                 external APIs (via restapis.py).
@@ -29,11 +30,10 @@
                 (often JsonResponse or TemplateResponse)
                 containing the requested data or result.
         5. HTTP Response:
-                Django sends the generated response back to the user's browser or
-                application.
+                Django sends the generated response back to the user's browser
+                or application.
 """
 
-from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
@@ -78,7 +78,7 @@ def get_cars(request):
     """
     count = CarMake.objects.filter().count()
     print(count)
-    if(count == 0):
+    if (count == 0):
         initiate()
     car_models = CarModel.objects.select_related('car_make')
     cars = []
@@ -131,7 +131,7 @@ def registration(request):
         # Check if user already exists with username
         User.objects.get(username=username)
         username_exist = True
-    except:
+    except Exception as e:
         # If not, log 'this as a new user'
         logger.debug("{} is new user".format(username))
 
@@ -158,13 +158,13 @@ def get_dealerships(request, state="All"):
 
         This view function retrieves dealership data from an external API using
         the`get_request` function. If the 'state' parameter is provided in the
-        request's GET parameters, it fetches dealerships for that specific state.
-        Otherwise, it fetches all dealerships.
+        request's GET parameters, it fetches dealerships for that specific 
+        state. Otherwise, it fetches all dealerships.
 
         Args:
-            request (HttpRequest): The incoming HTTP request object. The 'state'
-                parameter can be included in the request's GET parameters to
-                filter dealerships by a specific state.
+            request (HttpRequest): The incoming HTTP request object. The
+                'state' parameter can be included in the request's GET
+                parameters to filter dealerships by a specific state.
 
         Returns:
             JsonResponse: A JSON response containing:
@@ -177,15 +177,16 @@ def get_dealerships(request, state="All"):
     else:
         endpoint = "/fetchDealers/"+state
     dealerships = get_request(endpoint)
-    return JsonResponse({"status": 200,"dealers": dealerships})
+    return JsonResponse({"status": 200, "dealers": dealerships})
 
 
-def get_dealer_reviews(request,dealer_id):
+def get_dealer_reviews(request, dealer_id):
     """ Fetches and analyzes reviews for a specific dealer, returning a JSON
         response.
 
-        Retrieves reviews for the given dealer ID from an external API, analyzes
-        the sentiment of each review, and includes the sentiment in the response.
+        Retrieves reviews for the given dealer ID from an external API,
+        analyzes the sentiment of each review, and includes the sentiment in
+        the response.
 
         Args:
             request (HttpRequest): The incoming HTTP request object.
@@ -203,7 +204,7 @@ def get_dealer_reviews(request,dealer_id):
                         indicating a bad request.
     """
     # if dealer id has been provided
-    if(dealer_id):
+    if (dealer_id):
         endpoint = "/fetchReviews/dealer/"+str(dealer_id)
         reviews = get_request(endpoint)
         for review_detail in reviews:
@@ -212,11 +213,12 @@ def get_dealer_reviews(request,dealer_id):
             review_detail['sentiment'] = response['sentiment']
         return JsonResponse({"status": 200, "reviews": reviews})
     else:
-        return JsonResponse({"status": 400, "message":" Bad Request"})
+        return JsonResponse({"status": 400, "message": "Bad Request"})
 
 
 def get_dealer_details(request, dealer_id):
-    """ Fetches and returns the details of a specific dealer as a JSON response.
+    """ Fetches and returns the details of a specific dealer as a JSON
+        response.
 
         Retrieves dealer information based on the provided dealer ID from an
         external API.
@@ -231,12 +233,12 @@ def get_dealer_details(request, dealer_id):
                         200 for success (dealer details found),
                         400 for a bad request (invalid or missing dealer_id).
                 - "dealer" (dict, if status is 200):
-                        A dictionary containing all the details of the requested
-                        dealer, as returned by the external API.
+                        A dictionary containing all the details of the
+                        requested dealer, as returned by the external API.
                 - "message" (str, if status is 400):
                         An error message indicating a bad request.
     """
-    if(dealer_id):
+    if (dealer_id):
         endpoint = "/fetchDealer/"+str(dealer_id)
         dealership = get_request(endpoint)
         return JsonResponse({"status": 200, "dealer": dealership})
@@ -245,12 +247,13 @@ def get_dealer_details(request, dealer_id):
 
 
 def _add_review(request):
-    """Handles submission of a new dealership review from an authenticated user.
+    """Handles submission of a new dealership review from an authenticated
+       user.
 
         Checks if the user is authenticated. If so, parses the incoming JSON
-        request body, calls `post_review` to send review data to the backend API,
-        and returns a JSON response indicating success or failure. If the user
-        is not authenticated, it returns an unauthorized response.
+        request body, calls `post_review` to send review data to the backend
+        API, and returns a JSON response indicating success or failure. If
+        the user is not authenticated, it returns an unauthorized response.
 
         Args:
             request (HttpRequest): The incoming HTTP request. The body should
@@ -265,14 +268,14 @@ def _add_review(request):
                 - "status": 403 if the user is not authenticated. The response
                 will also include "message": "Unauthorized".
     """
-    if(request.user.is_anonymous == False):
+    if request.user.is_anonymous is False:
         data = json.loads(request.body)
         try:
             response = post_review(data)
             return JsonResponse({"status": 200})
-        except:
+        except Exception as e:
             return JsonResponse({"status": 401,
-                                 "message": "Error in posting review"})
+                                 f"message: Error: {e}"})
     else:
         return JsonResponse({"status": 403,
                              "message": "Unauthorized"})

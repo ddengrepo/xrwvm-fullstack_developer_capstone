@@ -1,4 +1,4 @@
-""" Defines functions for interacting with external REST APIs related to 
+""" Defines functions for interacting with external REST APIs related to
     dealership data and sentiment analysis.
 
     This module provides functions that make HTTP requests (GET and POST) to
@@ -8,7 +8,7 @@
     for network exceptions is also included.
 
 Flow:
-    External API Interaction: Defines functions for communicating with external 
+    External API Interaction: Defines functions for communicating with external
     REST APIs (e.g., backend, sentiment analyzer).
 
     Flow:
@@ -40,14 +40,14 @@ sentiment_analyzer_url = os.getenv(
 def get_request(endpoint, **kwargs):
     """ Sends a GET request to the backend URL's endpoint with optional
         parameters
-        
+
         Returns:
             the JSON response or None on network error.
     """
     params = ""
-    if(kwargs):
-        for key,value in kwargs.items():
-            params=params+key+"="+value+"&"
+    if (kwargs):
+        for key, value in kwargs.items():
+            params = params + key + "=" + value + "&"
 
     request_url = backend_url+endpoint+"?"+params
 
@@ -55,7 +55,7 @@ def get_request(endpoint, **kwargs):
     try:
         response = requests.get(request_url)
         return response.json()
-    except :
+    except:
         print("Network exception occurred")
 
 
