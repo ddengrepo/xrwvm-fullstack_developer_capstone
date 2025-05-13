@@ -52,3 +52,6 @@ npm run build
 git config --list
 git config --global user.email <>
 git config --global user.name <>
+
+git push origin <branch>
+git branch -a
