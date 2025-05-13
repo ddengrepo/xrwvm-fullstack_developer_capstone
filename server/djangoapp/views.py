@@ -115,7 +115,7 @@ def logout_request(request):
 # Create a `registration` view to handle sign up request
 # @csrf_exempt
 def registration(request):
-    context = {}
+    #context = {}
 
     # load & extract request data to use in below logic
     data = json.loads(request.body)
@@ -125,7 +125,7 @@ def registration(request):
     last_name = data['lastName']
     email = data['email']
     username_exist = False
-    email_exist = False
+    #email_exist = False
 
     try:
         # Check if user already exists with username
@@ -204,14 +204,16 @@ def get_dealer_reviews(request, dealer_id):
                 - "message" (str, if status is 400): An error message
                         indicating a bad request.
     """
-    dealer = get_object_or_404(Dealer, pk=dealer_id)
-    endpoint = "/fetchReviews/dealer/"+str(dealer_id)
-    reviews = get_request(endpoint)
-    for review_detail in reviews:
-        response = analyze_review_sentiments(review_detail['review'])
-        print(response)
-        review_detail['sentiment'] = response['sentiment']
-    return JsonResponse({"status": 200, "reviews": reviews})
+    #dealer = get_object_or_404(Dealer, pk=dealer_id)
+    if (dealer_id):
+        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+        reviews = get_request(endpoint)
+        for review_detail in reviews:
+            response = analyze_review_sentiments(review_detail['review'])
+            print(response)
+            review_detail['sentiment'] = response['sentiment']
+    else:
+        return JsonResponse({"status": 200, "reviews": reviews})
 
 
 def get_dealer_details(request, dealer_id):
@@ -236,10 +238,13 @@ def get_dealer_details(request, dealer_id):
                 - "message" (str, if status is 400):
                         An error message indicating a bad request.
     """
-    dealer_id = get_object_or_404(Dealer, pk=dealer_id)
-    endpoint = "/fetchDealer/"+str(dealer_id)
-    dealership = get_request(endpoint)
-    return JsonResponse({"status": 200, "dealer": dealership})
+    #dealer_id = get_object_or_404(Dealer, pk=dealer_id)
+    if (dealer_id):
+        endpoint = "/fetchDealer/"+str(dealer_id)
+        dealership = get_request(endpoint)
+        return JsonResponse({"status": 200, "dealer": dealership})
+    else:
+        return JsonResponse({"status": 400, "message": "Bad Request"})
 
 
 def _add_review(request):
