@@ -6,6 +6,8 @@ import review_icon from "../assets/reviewicon.png"
 
 const Dealers = () => {
   const [dealersList, setDealersList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [originalDealers, setOriginalDealers] = useState([]);
   // let [state, setState] = useState("")
   let [states, setStates] = useState([])
 
@@ -26,25 +28,41 @@ const Dealers = () => {
     }
   }
 
-  const get_dealers = async ()=>{
-    const res = await fetch(dealer_url, {
-      method: "GET"
-    });
-    const retobj = await res.json();
-    if(retobj.status === 200) {
-      let all_dealers = Array.from(retobj.dealers)
-      let states = [];
-      all_dealers.forEach((dealer)=>{
-        states.push(dealer.state)
-      });
+  const handleInputChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    const filtered = originalDealers.filter(dealer =>
+    dealer.state.toLowerCase().includes(query.toLowerCase())
+    );
+    setDealersList(filtered);
+    };
 
-      setStates(Array.from(new Set(states)))
-      setDealersList(all_dealers)
+    const handleLostFocus = () => {
+        if (!searchQuery) {
+          setDealersList(originalDealers);
+        }
+        }
+  
+  const get_dealers = async ()=>{
+      const res = await fetch(dealer_url, {
+          method: "GET"
+        });
+        const retobj = await res.json();
+        if(retobj.status === 200) {
+            let all_dealers = Array.from(retobj.dealers)
+            let states = [];
+            all_dealers.forEach((dealer)=>{
+                states.push(dealer.state)
+            });
+            
+            setStates(Array.from(new Set(states)))
+            setDealersList(all_dealers)
+            setOriginalDealers(all_dealers);
+        }
     }
-  }
-  useEffect(() => {
-    get_dealers();
-  },[]);  
+    useEffect(() => {
+        get_dealers();
+    },[]);  
 
 
 let isLoggedIn = sessionStorage.getItem("username") != null ? true : false;
@@ -60,13 +78,13 @@ return(
       <th>Address</th>
       <th>Zip</th>
       <th>
-      <select name="state" id="state" onChange={(e) => filterDealers(e.target.value)}>
-      <option value="" selected disabled hidden>State</option>
-      <option value="All">All States</option>
-      {states.map(state => (
-          <option value={state}>{state}</option>
-      ))}
-      </select>        
+      <input
+        type="text"
+        placeholder="Search states..."
+        onChange={handleInputChange}
+        onBlur={handleLostFocus}
+        value={searchQuery}
+      />     
 
       </th>
       {isLoggedIn ? (
