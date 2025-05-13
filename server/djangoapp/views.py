@@ -195,24 +195,38 @@ def get_dealer_reviews(request, dealer_id):
         Returns:
             JsonResponse: A JSON response containing:
                 - "status": 200 for success (reviews found and analyzed),
-                        400 for a bad request (invalid or missing dealer_id).
-                - "review" (list, if status is 200): A list of review
-                        dictionaries. Each dictionary contains the original
-                        review details along with an added "sentiment" key
-                        indicating the analyzed sentiment.
+                          400 for a bad request (invalid or missing dealer_id).
+                - "reviews" (list, if status is 200): A list of review
+                          dictionaries. Each dictionary contains the original
+                          review details along with an added "sentiment" key
+                          indicating the analyzed sentiment.
                 - "message" (str, if status is 400): An error message
-                        indicating a bad request.
+                          indicating a bad request.
     """
-    # dealer = get_object_or_404(Dealer, pk=dealer_id)
-    if (dealer_id):
-        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
-        reviews = get_request(endpoint)
-        for review_detail in reviews:
-            response = analyze_review_sentiments(review_detail['review'])
-            print(response)
-            review_detail['sentiment'] = response['sentiment']
+    if dealer_id:
+        try:
+            dealer_id = int(dealer_id)  # Ensure dealer_id is an integer
+            # Optional: Verify if the dealer_id exists in your local system
+            # dealer = get_object_or_404(Dealer, pk=dealer_id)
+
+            endpoint = "/fetchReviews/dealer/" + str(dealer_id)
+            reviews = get_request(endpoint)
+            if reviews:
+                for review_detail in reviews:
+                    response = analyze_review_sentiments(review_detail['review'])
+                    print(response)
+                    review_detail['sentiment'] = response.get('sentiment')  # Use .get() to avoid KeyError
+                return JsonResponse({"status": 200, "reviews": reviews})
+            else:
+                return JsonResponse({"status": 200, "reviews": []})  # No reviews found, but valid request
+        except ValueError:
+            return JsonResponse({"status": 400, "message": "Invalid dealer_id format."})
+        # except Dealer.DoesNotExist:  # If you uncomment the get_object_or_404
+        #     return JsonResponse({"status": 400, "message": f"Dealer with ID {dealer_id} not found."})
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": f"Error fetching or processing reviews: {e}"})
     else:
-        return JsonResponse({"status": 200, "reviews": reviews})
+        return JsonResponse({"status": 400, "message": "dealer_id parameter is missing."})
 
 
 def get_dealer_details(request, dealer_id):
